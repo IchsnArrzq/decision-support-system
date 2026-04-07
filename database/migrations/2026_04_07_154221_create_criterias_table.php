@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('criterias', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->float('weight');
+            $table->string('type');
             $table->timestamps();
         });
     }

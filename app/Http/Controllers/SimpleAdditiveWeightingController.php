@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class SimpleAdditiveWeightingController extends Controller
 {
-    //
+    public function __invoke()
+    {
+        return view('simple-additive-weighting.index');
+    }
 }

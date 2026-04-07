@@ -6,5 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Alternative extends Model
 {
-    //
+    public function values()
+    {
+        return $this->hasMany(Value::class);
+    }
 }

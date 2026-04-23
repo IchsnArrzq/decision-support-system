@@ -8,10 +8,30 @@ use Livewire\Component;
 
 class Table extends Component
 {
+    public function criterias()
+    {
+        return Criteria::query()
+            ->orderBy('code')
+            ->get();
+    }
+
     public function results()
     {
-        $alternatives = Alternative::with('values.criteria')->get();
-        $criterias = Criteria::all();
+        $criterias = $this->criterias();
+        $alternatives = Alternative::query()
+            ->whereNotNull('code')
+            ->with('values.criteria')
+            ->get()
+            ->filter(function ($alternative) use ($criterias) {
+                return $criterias->every(function ($criteria) use ($alternative) {
+                    return $alternative->values->contains('criteria_id', $criteria->id);
+                });
+            })
+            ->values();
+
+        if ($criterias->isEmpty() || $alternatives->isEmpty()) {
+            return [];
+        }
 
         // 1. Normalisasi
         $divisor = [];
@@ -20,18 +40,17 @@ class Table extends Component
             $sum = 0;
             foreach ($alternatives as $alt) {
                 $val = $alt->values->where('criteria_id', $c->id)->first();
-                $sum += pow($val->value, 2);
+                $sum += pow((float) $val->value, 2);
             }
-            $divisor[$c->id] = sqrt($sum);
+            $divisor[$c->id] = $sum > 0 ? sqrt($sum) : 1;
         }
 
         // 2. Matriks ternormalisasi terbobot
         $normalized = [];
 
         foreach ($alternatives as $alt) {
-            foreach ($alt->values as $val) {
-                $c = $val->criteria;
-
+            foreach ($criterias as $c) {
+                $val = $alt->values->where('criteria_id', $c->id)->first();
                 $r = $val->value / $divisor[$c->id];
                 $y = $r * $c->weight;
 
@@ -73,10 +92,15 @@ class Table extends Component
             $dMinus = sqrt($dMinus);
 
             // 5. Nilai preferensi
-            $score = $dMinus / ($dPlus + $dMinus);
+            $score = ($dPlus + $dMinus) > 0 ? $dMinus / ($dPlus + $dMinus) : 0;
 
             $results[] = [
+                'code' => $alt->code,
+                'brand' => $alt->brand,
                 'name' => $alt->name,
+                'category' => $alt->category,
+                'transmission' => $alt->transmission,
+                'price' => $alt->price,
                 'score' => round($score, 4),
             ];
         }
@@ -84,13 +108,19 @@ class Table extends Component
         // 6. Ranking
         usort($results, fn ($a, $b) => $b['score'] <=> $a['score']);
 
+        foreach ($results as $index => &$result) {
+            $result['rank'] = $index + 1;
+        }
+        unset($result);
+
         return $results;
     }
 
     public function render()
     {
         $results = $this->results();
+        $criterias = $this->criterias();
 
-        return view('livewire.pages.techniquefor-order-preferenceby-similarityto-ideal-solution.table', compact('results'));
+        return view('livewire.pages.techniquefor-order-preferenceby-similarityto-ideal-solution.table', compact('results', 'criterias'));
     }
 }

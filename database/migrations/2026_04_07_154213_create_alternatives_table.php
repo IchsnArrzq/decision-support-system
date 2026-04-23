@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('alternatives', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
             $table->string('name');
+            $table->string('brand');
+            $table->string('category');
+            $table->string('transmission');
+            $table->unsignedBigInteger('price');
             $table->timestamps();
         });
     }

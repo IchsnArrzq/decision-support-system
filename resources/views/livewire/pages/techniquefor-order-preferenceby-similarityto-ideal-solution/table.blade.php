@@ -1,15 +1,25 @@
 <div class="space-y-6">
-    <div class="card w-full bg-base-100 shadow-sm">
-        <div class="card-body">
-            <h2 class="card-title">SPK Pemilihan Kendaraan Motor - TOPSIS</h2>
-            <p class="text-sm opacity-80">
-                Kategori alternatif: matic, bebek, sport/kopling, dan skuter.
-                Bobot indikator dapat disesuaikan berdasarkan kebutuhan pengguna.
-            </p>
+    <marquee behavior="" direction="" class="h-80">
+        <div class="card bg-base-100 shadow-amber-300 w-100 text-wrap shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">SPK Pemilihan Kendaraan Motor - TOPSIS</h2>
+                <h5>ichsan arrizqi</h5>
+                <h5>231011401256</h5>
+            </div>
         </div>
-    </div>
-
-    <div class="card w-full bg-base-100 shadow-sm">
+    </marquee>
+    <div class="text-xl font-bold" id="time"></div>
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time').innerText = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            // tampilkan tanggal dan waktu dalam format lokal Y-m-d H:i:s
+            // document.getElementById('time').innerText = now.toISOString().slice(0, 19).replace('T', ' ');
+        }
+        updateTime()
+        setInterval(updateTime, 1000);
+    </script>
+    {{-- <div class="card w-full bg-base-100 shadow-sm">
         <div class="card-body p-0">
             <div class="w-full overflow-x-auto">
                 <table class="table">
@@ -39,7 +49,7 @@
                 </table>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="card w-full bg-base-100 shadow-sm">
         <div class="card-body p-0">
@@ -71,7 +81,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">Data alternatif dan nilai TOPSIS belum lengkap.</td>
+                                <td colspan="8" class="text-center">Data alternatif dan nilai TOPSIS belum lengkap.
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
